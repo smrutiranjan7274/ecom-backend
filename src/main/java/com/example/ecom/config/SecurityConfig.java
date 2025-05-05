@@ -1,11 +1,11 @@
-package com.example.ecom.security;
+package com.example.ecom.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
+// import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -18,12 +18,9 @@ public class SecurityConfig {
                                 .frameOptions(frame -> frame.disable())) // Allow H2 console access
                                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for APIs
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/api/**") // Allow access to API endpoints
+                                                .requestMatchers("/api/**", "/api/products/**", "/**")
                                                 .permitAll()
-                                                .anyRequest().authenticated())
-                                .sessionManagement(session -> session
-                                                // Use stateless session management
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                                                .anyRequest().authenticated());
                 // Add JWT filter here if needed
 
                 return http.build();
