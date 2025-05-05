@@ -1,4 +1,4 @@
-﻿# E-Commerce Backend (Work in Progress 🚧)
+﻿# E-Commerce Backend
 
 A Spring Boot backend service for an e-commerce platform, currently under active development.
 
