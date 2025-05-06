@@ -94,7 +94,6 @@ public class ProductController {
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
         return productRepository.findById(id)
                 .map(existingProduct -> {
-                    // Update all fields of the existing product
                     existingProduct.setName(productDetails.getName());
                     existingProduct.setDescription(productDetails.getDescription());
                     existingProduct.setPrice(productDetails.getPrice());
