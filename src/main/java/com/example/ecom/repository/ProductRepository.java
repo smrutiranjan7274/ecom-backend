@@ -2,7 +2,6 @@ package com.example.ecom.repository;
 
 import com.example.ecom.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -56,15 +55,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * @return sorted list of products
      */
     List<Product> findByCategoryOrderByPriceAsc(String category);
-
-    /**
-     * Find top N most expensive products
-     * 
-     * @param limit number of products to return
-     * @return list of products sorted by price descending
-     */
-    @Query("SELECT p FROM Product p ORDER BY p.price DESC")
-    List<Product> findTopExpensiveProducts(int limit);
 
     /**
      * Check if a product exists by its name (case insensitive)
