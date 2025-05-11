@@ -2,46 +2,92 @@ package com.example.ecom.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 
+/**
+ * Utility class for handling JWT operations.
+ */
 @Component
 public class JwtUtil {
-    private final String jwtSecret = "your-256-bit-secret-your-256-bit-secret";
-    private final long jwtExpirationMs = 86400000; // 1 day
 
+    // =======================
+    // JWT Configuration
+    // =======================
+    @Value("${jwt.secret}")
+    private String JWT_SECRET;
+    private static final long JWT_EXPIRATION_MS = 86400000; // 1 day
+
+    // =======================
+    // Key Management
+    // =======================
+    /**
+     * Returns the signing key for JWT.
+     */
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        return Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
     }
 
+    // =======================
+    // Token Generation
+    // =======================
+    /**
+     * Generates a JWT token for the given username and role.
+     */
     public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_MS))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    // =======================
+    // Token Parsing
+    // =======================
+    /**
+     * Extracts the username (subject) from the JWT token.
+     */
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        return getClaims(token).getSubject();
     }
 
+    /**
+     * Extracts the role from the JWT token.
+     */
     public String getRoleFromToken(String token) {
-        return (String) Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
-                .parseClaimsJws(token).getBody().get("role");
+        return (String) getClaims(token).get("role");
     }
 
+    // =======================
+    // Token Validation
+    // =======================
+    /**
+     * Validates the JWT token.
+     */
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            getClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    /**
+     * Parses the JWT token and returns the claims.
+     */
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
