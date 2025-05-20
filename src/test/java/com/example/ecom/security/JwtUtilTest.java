@@ -3,8 +3,6 @@ package com.example.ecom.security;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
