@@ -1,7 +1,0 @@
-{
-  "build": {
-    "builder": "DOCKERFILE",
-    "buildCommand": "./mvnw clean package -DskipTests",
-    "buildPath": "."
-  }
-}
