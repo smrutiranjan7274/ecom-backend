@@ -1,21 +1,13 @@
-# Stage 1: Build the JAR
+# Stage 1: Build JAR
 FROM eclipse-temurin:17-jdk-jammy as builder
-
 WORKDIR /app
-# Copy all files (including mvnw and .mvn/wrapper)
-COPY . .  
+COPY . .
+RUN chmod +x mvnw && ./mvnw clean package -DskipTests
 
-# Fix permissions for Maven Wrapper
-RUN chmod +x mvnw  # Grant execute permission
-
-# Build the JAR
-RUN ./mvnw clean package -DskipTests  # Now this will work
-
-# ------------------------------------
-
-# Stage 2: Run the JAR
+# Stage 2: Run JAR
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
+RUN mkdir -p /app/data && chmod -R 777 /app/data
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx256m", "-Xms128m", "-jar", "app.jar"]
