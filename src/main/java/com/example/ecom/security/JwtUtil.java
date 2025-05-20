@@ -90,4 +90,18 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    public String generateTokenWithCustomExpiration(String username, String role, long expirationTime) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public void setJwtSecret(String testSecretKey) {
+        this.JWT_SECRET = testSecretKey;
+    }
 }
