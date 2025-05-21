@@ -25,17 +25,18 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> req) {
         if (userRepository.findByEmail(req.get("email")).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Email already registered"));
         }
         User user = User.builder()
                 .name(req.get("name"))
-                // .phone(Long.parseLong(req.get("phone")))
                 .email(req.get("email"))
                 .password(passwordEncoder.encode(req.get("password")))
                 .role(req.getOrDefault("role", "USER"))
                 .build();
         userRepository.save(user);
-        return ResponseEntity.ok("User registered successfully");
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        return ResponseEntity.ok(Map.of("token", token, "role", user.getRole(), "email", user.getEmail(), "name",
+                user.getName(), "id", user.getId(), "message", "User registered successfully"));
     }
 
     @PostMapping("/login")
@@ -43,11 +44,11 @@ public class AuthController {
         User user = userRepository.findByEmail(req.get("email"))
                 .orElse(null);
         if (user == null || !passwordEncoder.matches(req.get("password"), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid email or password"));
         }
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
         return ResponseEntity.ok(Map.of("token", token, "role", user.getRole(), "email", user.getEmail(), "name",
-                user.getName(), "id", user.getId()));
+                user.getName(), "id", user.getId(), "message", "User logged in successfully"));
     }
 
     @GetMapping("/admin")
