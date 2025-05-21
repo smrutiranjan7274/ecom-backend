@@ -13,6 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.ecom.security.JwtAuthFilter;
+import com.example.ecom.security.CustomAuthEntryPoint;
+import com.example.ecom.security.CustomAccessDeniedHandler;
 
 /**
  * Security configuration for the application.
@@ -29,6 +31,12 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
+    @Autowired
+    private CustomAuthEntryPoint customAuthEntryPoint;
+
+    @Autowired
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
+
     /**
      * Constructor for dependency injection of UserDetailsService.
      *
@@ -44,13 +52,16 @@ public class SecurityConfig {
      * - Disables frame options for H2 console access (for development).
      * - Disables CSRF protection (stateless JWT-based security).
      * - Sets endpoint access rules:
-     *      - "/h2-console/**", "/api/auth/login", and "/api/auth/register" are public.
-     *      - "/api/products/**" is public (product browsing).
-     *      - "/api/auth/admin" requires the ADMIN role.
-     *      - All other "/api/**" endpoints require authentication.
-     *      - Any other requests also require authentication.
+     * - "/h2-console/**", "/api/auth/login", and "/api/auth/register" are public.
+     * - "/api/products/**" GET requests are public (product browsing).
+     * - "/api/products" POST requests require SELLER or ADMIN roles.
+     * - "/api/auth/admin" requires the ADMIN role.
+     * - All other "/api/**" endpoints require authentication.
+     * - Any other requests also require authentication.
      * - Registers the custom UserDetailsService for user lookup.
-     * - Adds the JWT authentication filter before the standard username/password filter.
+     * - Adds the JWT authentication filter before the standard username/password
+     * filter.
+     * - Configures custom authentication entry point and access denied handler.
      *
      * @param http the HttpSecurity object to configure
      * @return the configured SecurityFilterChain
@@ -59,23 +70,26 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                // Public endpoints (H2 console, login, registration)
-                .requestMatchers("/h2-console/**", "/api/auth/login", "/api/auth/register").permitAll()
-                // Public product endpoints
-                .requestMatchers("/api/products/**").permitAll()
-                // Admin-only endpoint
-                .requestMatchers("/api/auth/admin").hasRole("ADMIN")
-                // For future: admin and seller endpoints
-                // .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // .requestMatchers("/api/seller/**").hasAnyRole("SELLER", "ADMIN")
-                // All other API endpoints require authentication
-                .requestMatchers("/api/**").authenticated()
-                // Any other requests require authentication
-                .anyRequest().authenticated())
-            .userDetailsService(userDetailsService)
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        // Public endpoints (H2 console, login, registration)
+                        .requestMatchers("/h2-console/**", "/api/auth/login", "/api/auth/register").permitAll()
+                        // Public product GET endpoints
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**").permitAll()
+                        // Only SELLER or ADMIN can POST to /api/products (add product)
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/products")
+                        .hasAnyRole("SELLER", "ADMIN")
+                        // Admin-only endpoint
+                        .requestMatchers("/api/auth/admin").hasRole("ADMIN")
+                        // All other API endpoints require authentication
+                        .requestMatchers("/api/**").authenticated()
+                        // Any other requests require authentication
+                        .anyRequest().authenticated())
+                .userDetailsService(userDetailsService)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler));
         return http.build();
     }
 
