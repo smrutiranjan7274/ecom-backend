@@ -97,14 +97,14 @@ class ProductControllerTest {
     void deleteProduct_found() {
         when(productRepository.existsById("1")).thenReturn(true); // Changed 1L to "1"
         doNothing().when(productRepository).deleteById("1"); // Changed 1L to "1"
-        ResponseEntity<Void> response = productController.deleteProduct("1"); // Changed 1L to "1"
+        ResponseEntity<Map<String, String>> response = productController.deleteProduct("1"); // Changed 1L to "1"
         assertThat(response.getStatusCode().value()).isEqualTo(204);
     }
 
     @Test
     void deleteProduct_notFound() {
         when(productRepository.existsById("2")).thenReturn(false); // Changed 2L to "2"
-        ResponseEntity<Void> response = productController.deleteProduct("2"); // Changed 2L to "2"
+        ResponseEntity<Map<String, String>> response = productController.deleteProduct("2"); // Changed 2L to "2"
         assertThat(response.getStatusCode().value()).isEqualTo(404);
     }
 }
