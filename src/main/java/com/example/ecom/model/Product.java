@@ -1,6 +1,7 @@
 package com.example.ecom.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -8,8 +9,7 @@ import java.math.BigDecimal;
 /**
  * Entity representing a product in the e-commerce system.
  */
-@Entity
-@Table(name = "products")
+@Document(collection = "products")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,21 +17,12 @@ import java.math.BigDecimal;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false)
     private String name;
-
     private String description;
-
-    @Column(nullable = false)
     private BigDecimal price;
-
     private String imageUrl;
-
-    @Column(nullable = false)
     private Integer stockQuantity;
-
     private String category;
 }

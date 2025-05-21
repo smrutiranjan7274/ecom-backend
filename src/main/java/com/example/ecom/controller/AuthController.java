@@ -49,7 +49,7 @@ public class AuthController {
 
     @GetMapping("/admin")
     public List<User> getAllUsers() {
-        return userRepository.getAllUsersDetails();
+        return userRepository.findAll();
     }
 
 }

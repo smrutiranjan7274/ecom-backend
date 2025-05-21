@@ -43,7 +43,7 @@ public class ProductController {
      * @return ResponseEntity containing the product if found, or 404 if not found
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<Product> getProductById(@PathVariable String id) {
         Optional<Product> product = productRepository.findById(id);
         return product.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -91,7 +91,7 @@ public class ProductController {
      *         found
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
+    public ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody Product productDetails) {
         return productRepository.findById(id)
                 .map(existingProduct -> {
                     existingProduct.setName(productDetails.getName());
@@ -113,7 +113,7 @@ public class ProductController {
      * @return ResponseEntity with no content if deleted, or 404 if not found
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
             return ResponseEntity.noContent().build();
