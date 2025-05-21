@@ -24,11 +24,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> req) {
-        if (userRepository.findByUsername(req.get("username")).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+        if (userRepository.findByEmail(req.get("email")).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered");
         }
         User user = User.builder()
-                .username(req.get("username"))
+                .name(req.get("name"))
+                // .phone(Long.parseLong(req.get("phone")))
+                .email(req.get("email"))
                 .password(passwordEncoder.encode(req.get("password")))
                 .role(req.getOrDefault("role", "USER"))
                 .build();
@@ -38,13 +40,14 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> req) {
-        User user = userRepository.findByUsername(req.get("username"))
+        User user = userRepository.findByEmail(req.get("email"))
                 .orElse(null);
         if (user == null || !passwordEncoder.matches(req.get("password"), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email credentials");
         }
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
-        return ResponseEntity.ok(Map.of("token", token, "role", user.getRole()));
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        return ResponseEntity.ok(Map.of("token", token, "role", user.getRole(), "email", user.getEmail(), "name",
+                user.getName()));
     }
 
     @GetMapping("/admin")

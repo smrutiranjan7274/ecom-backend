@@ -10,7 +10,8 @@ import java.util.Collections;
 
 /**
  * Custom implementation of UserDetailsService for Spring Security.
- * Loads user-specific data from the database for authentication and authorization.
+ * Loads user-specific data from the database for authentication and
+ * authorization.
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -33,14 +34,13 @@ public class CustomUserDetailsService implements UserDetailsService {
      * @throws UsernameNotFoundException if the user is not found
      */
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        // Create a UserDetails object with username, password, and role-based authority
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        // Create a UserDetails object with email, password, and role-based authority
         return new org.springframework.security.core.userdetails.User(
-            user.getUsername(),
-            user.getPassword(),
-            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().toUpperCase()))
-        );
+                user.getEmail(),
+                user.getPassword(),
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().toUpperCase())));
     }
 }
