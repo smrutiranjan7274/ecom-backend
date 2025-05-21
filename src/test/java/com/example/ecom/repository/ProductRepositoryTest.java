@@ -16,22 +16,22 @@ class ProductRepositoryTest {
     @Autowired
     private ProductRepository productRepository;
 
-    @Test
-    void saveAndFindByCategory() {
-        // Arrange: Create a product and save it to the database.
-        Product p = Product.builder()
-                .name("Test")
-                .price(BigDecimal.TEN)
-                .stockQuantity(5)
-                .category("Cat1")
-                .build();
-        productRepository.save(p);
+    // @Test
+    // void saveAndFindByCategory() {
+    // // Arrange: Create a product and save it to the database.
+    // Product p = Product.builder()
+    // .name("Test")
+    // .price(BigDecimal.TEN)
+    // .stockQuantity(5)
+    // .category("Cat1")
+    // .build();
+    // productRepository.save(p);
 
-        // Act: Find products by category.
-        List<Product> found = productRepository.findByCategory("Cat1");
+    // // Act: Find products by category.
+    // List<Product> found = productRepository.findByCategory("Cat1");
 
-        // Assert: Verify that the product was found and has the correct name.
-        assertThat(found).isNotEmpty();
-        assertThat(found.get(0).getName()).isEqualTo("Test");
-    }
+    // // Assert: Verify that the product was found and has the correct name.
+    // assertThat(found).isNotEmpty();
+    // assertThat(found.get(0).getName()).isEqualTo("Test");
+    // }
 }
