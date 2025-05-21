@@ -30,32 +30,38 @@ class CustomUserDetailsServiceTest {
     @Test
     void loadUserByUsername_found() {
         // Arrange: Set up the test data and mock the UserRepository's behavior.
-        // Create a sample User object with a username, password, and role.
+        // Create a sample User object with a name, password, and role.
         User user = User.builder()
-                .username("test")
+                .name("test")
+                .email("test@email.com")
                 .password("pass")
                 .role("USER")
                 .build();
-        // Mock the UserRepository's findByUsername method to return the sample User when called with "test".
-        when(userRepository.findByUsername("test")).thenReturn(Optional.of(user));
+        // Mock the UserRepository's findByEmail method to return the sample User when
+        // called with "test".
+        when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
 
-        // Act: Call the loadUserByUsername method with the username "test".
-        UserDetails details = service.loadUserByUsername("test");
+        // Act: Call the loadUserByUsername method with the email "test@email.com".
+        UserDetails details = service.loadUserByUsername("test@email.com");
 
-        // Assert: Verify that the returned UserDetails object has the correct username and authorities.
-        // Assert that the username of the UserDetails object is equal to "test".
+        // Assert: Verify that the returned UserDetails object has the correct email and
+        // authorities.
+        // Assert that the email of the UserDetails object is equal to "test".
         assertThat(details.getUsername()).isEqualTo("test");
-        // Assert that the authorities of the UserDetails object contain the "ROLE_USER" authority.
+        // Assert that the authorities of the UserDetails object contain the "ROLE_USER"
+        // authority.
         assertThat(details.getAuthorities()).extracting("authority").contains("ROLE_USER");
     }
 
     @Test
     void loadUserByUsername_notFound() {
         // Arrange: Set up the test data and mock the UserRepository's behavior.
-        // Mock the UserRepository's findByUsername method to return an empty Optional when called with "notfound".
-        when(userRepository.findByUsername("notfound")).thenReturn(Optional.empty());
+        // Mock the UserRepository's findByEmail method to return an empty Optional
+        // when called with "notfound".
+        when(userRepository.findByEmail("notfound")).thenReturn(Optional.empty());
 
-        // Act & Assert: Call the loadUserByUsername method with the username "notfound" and assert that it throws a UsernameNotFoundException.
+        // Act & Assert: Call the loadUserByUsername method with the username "notfound"
+        // and assert that it throws a UsernameNotFoundException.
         assertThrows(UsernameNotFoundException.class, () -> service.loadUserByUsername("notfound"));
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class EcomBackendApplicationTests {
 
-	// TODO: Add test cases
+	// This is a placeholder for the main application test class.
 
 	// Additional tests that could be added:
 	// 1. Test for ProductController:
