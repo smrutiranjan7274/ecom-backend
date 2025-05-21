@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * REST Controller for managing Product operations.
@@ -110,14 +112,17 @@ public class ProductController {
      * Delete a product by its ID
      * 
      * @param id The ID of the product to delete
-     * @return ResponseEntity with no content if deleted, or 404 if not found
+     * @return ResponseEntity with a message if deleted, or 404 if not found
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
+    public ResponseEntity<Map<String, String>> deleteProduct(@PathVariable String id) {
+        Map<String, String> response = new HashMap<>();
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
+            response.put("message", "Product deleted successfully");
+            return ResponseEntity.ok(response);
         }
-        return ResponseEntity.notFound().build();
+        response.put("message", "Product not found");
+        return ResponseEntity.status(404).body(response);
     }
 }
